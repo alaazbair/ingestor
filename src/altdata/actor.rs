@@ -29,7 +29,7 @@ impl Actor for AltDataActor {
             tokio::select! {
                 // Graceful shutdown signal
                 _ = self.shutdown.cancelled() => {
-                    info!("StrategyActor: shutdown requested");
+                    info!("AltDataActor: shutdown requested");
                     break; // exit loop -> return Ok(())
                 }
                 

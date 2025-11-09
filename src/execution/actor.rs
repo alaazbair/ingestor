@@ -26,7 +26,7 @@ impl Actor for ExecutionActor {
             tokio::select! {
                 // Graceful shutdown signal
                 _ = self.shutdown.cancelled() => {
-                        info!("StrategyActor: shutdown requested");
+                        info!("ExecutionActor: shutdown requested");
                         break;
                 }
 

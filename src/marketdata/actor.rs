@@ -25,7 +25,7 @@ impl Actor for MarketDataActor {
             tokio::select! {
                 // Graceful shutdown signal
                 _ = self.shutdown.cancelled() => {
-                    info!("StrategyActor: shutdown requested");
+                    info!("MarketDataActor: shutdown requested");
                     break;
                 }
 
