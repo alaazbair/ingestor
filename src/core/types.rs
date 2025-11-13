@@ -1,4 +1,6 @@
 use anyhow::Result;
+use serde::Deserialize;
+use tokio_util::either::Either;
 
 #[async_trait::async_trait]
 pub trait Actor: Send + Sync + 'static {
@@ -15,17 +17,6 @@ pub struct RawNews {
     pub lede: String,
     pub ts_ms: i64,
     pub lang: String,
-}
-
-#[derive(Clone, Debug)]
-pub struct PredictionMarket {
-    pub market_id: String,
-    pub slug: String,
-    pub question: String,
-    pub category: String,
-    pub end_time_ms: i64,
-    pub liquidity: f64,
-    pub is_open: bool,
 }
 
 #[derive(Clone, Debug)]
@@ -59,4 +50,20 @@ pub struct Execution {
     pub filled: f32,
     pub fee: f32,
     pub ts_ms: i64,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+pub struct PolyMarketEvent {
+    pub id: String,
+    #[serde(default)]
+    pub title: Option<String>,
+    #[serde(default)]
+    pub description: Option<String>,
+    #[serde(default)]
+    pub markets: Option<Vec<PolyMarketMarket>>
+}
+
+#[derive(Clone, Debug, Deserialize)]
+pub struct PolyMarketMarket {
+    pub id: String,
 }

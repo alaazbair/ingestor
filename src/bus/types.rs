@@ -1,8 +1,10 @@
+use std::fmt::Debug;
 use std::sync::Arc;
 use anyhow::Result;
 use async_trait::async_trait;
 use tokio::sync::{broadcast};
-use crate::core::types::{RawNews, PredictionMarket, MarketDataRequest, MarketDataSnap, Order, Execution};
+use tracing::info;
+use crate::core::types::{RawNews, MarketDataRequest, MarketDataSnap, Order, Execution, PolyMarketEvent};
 
 // ---------- Topic trait (broadcast semantics) ----------
 #[async_trait::async_trait]
@@ -28,8 +30,9 @@ impl<T: Clone + Send + Sync + 'static> BroadcastTopic<T> {
 }
 
 #[async_trait]
-impl<T: Clone + Send + Sync + 'static> Topic<T> for BroadcastTopic<T> {
+impl<T: Debug + Clone + Send + Sync + 'static> Topic<T> for BroadcastTopic<T> {
     async fn publish(&self, msg: T) -> Result<()> {
+        info!("Publishing message: {:?}", msg);
         // Non-blocking; errors only when no receivers (we can ignore or log)
         let _ = self.tx.send(Arc::new(msg));
         Ok(())
@@ -43,7 +46,7 @@ impl<T: Clone + Send + Sync + 'static> Topic<T> for BroadcastTopic<T> {
 #[derive(Clone)]
 pub struct Bus {
     pub raw_news: Arc<dyn Topic<RawNews>>,
-    pub prediction_market: Arc<dyn Topic<PredictionMarket>>,
+    pub polymarket_events: Arc<dyn Topic<PolyMarketEvent>>,
     pub market_data_request: Arc<dyn Topic<MarketDataRequest>>,
     pub market_data: Arc<dyn Topic<MarketDataSnap>>,
     pub orders: Arc<dyn Topic<Order>>,
@@ -56,7 +59,7 @@ impl Bus {
 
         Self {
             raw_news: Arc::new(BroadcastTopic::<RawNews>::with_capacity(cap)),
-            prediction_market: Arc::new(BroadcastTopic::<PredictionMarket>::with_capacity(cap)),
+            polymarket_events: Arc::new(BroadcastTopic::<PolyMarketEvent>::with_capacity(cap)),
             market_data_request: Arc::new(BroadcastTopic::<MarketDataRequest>::with_capacity(cap)),
             market_data: Arc::new(BroadcastTopic::<MarketDataSnap>::with_capacity(cap)),
             orders: Arc::new(BroadcastTopic::<Order>::with_capacity(cap)),

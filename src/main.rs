@@ -5,13 +5,14 @@ mod execution;
 mod altdata;
 mod core;
 
+use std::time::Duration;
 use anyhow::Result;
 use bus::types::Bus;
 use execution::actor::ExecutionActor;
 use altdata::actor::AltDataActor;
 use marketdata::actor::MarketDataActor;
 use strategy::actor::StrategyActor;
-
+use reqwest::Client;
 use tracing::{error, info, info_span, Instrument};
 use tokio_util::sync::CancellationToken;
 
@@ -36,8 +37,18 @@ async fn main()  -> Result<()>   {
     let bus = Bus::new();
     let shutdown = CancellationToken::new();
 
+    info!("Initializing Client");
+    let client = Client::builder()
+        .user_agent("poly mind")
+        .pool_idle_timeout(Duration::from_secs(30))
+        .pool_max_idle_per_host(8)
+        .tcp_keepalive(Duration::from_secs(30))
+        .timeout(Duration::from_secs(10))
+        .build()
+        .expect("client");
+
     info!("Building actors");
-    let alt_data = AltDataActor::new(bus.clone(), shutdown.clone());
+    let alt_data = AltDataActor::new(bus.clone(), client.clone(), shutdown.clone());
     let market_data = MarketDataActor::new(bus.clone(), shutdown.clone());
     let strat = StrategyActor::new(bus.clone(), shutdown.clone());
     let exec = ExecutionActor::new(bus.clone(), shutdown.clone());
