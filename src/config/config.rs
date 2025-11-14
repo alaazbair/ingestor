@@ -64,7 +64,8 @@ pub struct RssCfg {
 pub struct FinJuiceCfg {
     pub baseUrl: String,
     #[serde(with = "humantime_serde")]
-    pub refresh: Duration
+    pub refresh: Duration,
+    pub cookie: String
 }
 
 

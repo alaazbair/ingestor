@@ -20,8 +20,8 @@ rss:
     - id: "cnn"
       url: "http://rss.cnn.com/rss/edition.rss"
       lang: "en"
-    - id: "ecb-press"
-      url: "https://www.ecb.europa.eu/press/pressconf/html/index.en.rss"
+    - id: "wsj"
+      url: "https://feeds.a.dj.com/rss/RSSWorldNews.xml"
       lang: "en"
 
 financialJuice:

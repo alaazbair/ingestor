@@ -9,13 +9,12 @@ pub trait Actor: Send + Sync + 'static {
 // ----------- Domain messages -----------------
 #[derive(Clone, Debug)]
 pub struct RawNews {
-    pub content_hash: String,
-    pub source: String,
     pub url: String,
     pub title: String,
-    pub lede: String,
-    pub ts_ms: i64,
-    pub lang: String,
+    pub description: String,
+    pub feed: String,
+    pub published: Option<chrono::DateTime<chrono::Utc>>,
+    pub labels: Vec<String>
 }
 
 #[derive(Clone, Debug)]
